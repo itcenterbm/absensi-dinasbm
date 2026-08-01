@@ -14,16 +14,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    :root {
-      --sidebar-width: 260px;
-    }
     body { 
       background-color: #f4f6f9; 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
       -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
     
-    /* Layout Desktop */
+    /* Layout Sidebar Desktop */
     .sidebar { 
       min-height: 100vh; 
       background: #1e293b; 
@@ -43,25 +41,25 @@
       background: #334155; 
     }
     
-    /* Webcam Kamera Responsif */
+    /* Webcam Kamera Responsif Layar HP */
     #webcamVideo { 
       width: 100%; 
-      max-width: 400px; 
-      height: auto; 
-      border-radius: 16px; 
+      max-width: 320px; 
+      max-height: 32vh; 
+      object-fit: cover;
+      border-radius: 12px; 
       background: #000; 
       transform: scaleX(-1); 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     #canvasFoto { display: none; }
 
-    /* Penyesuaian Mobile / Smartphone */
+    /* Optimization Khusus Layar Mobile (HP) */
     @media (max-width: 767.98px) {
-      .sidebar { min-height: auto; }
-      .main-content { padding: 15px !important; }
-      .card { border-radius: 12px !important; }
-      .table-responsive { font-size: 0.85rem; }
-      .btn-lg-mobile { padding: 12px 16px; font-size: 1rem; }
+      .main-content { padding: 10px !important; }
+      .card-mobile-compact { padding: 15px 12px !important; margin-bottom: 0 !important; }
+      .btn-mobile-lg { padding: 12px; font-size: 0.95rem; font-weight: bold; }
+      .status-gps-box { margin-top: 8px !important; margin-bottom: 12px !important; font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -100,39 +98,38 @@
 <!-- MAIN APP CONTAINER -->
 <div id="sectionMainApp" class="d-none">
   
-  <!-- NAVBAR MOBILE (Hanya tampil di Layar HP) -->
-  <nav class="navbar navbar-dark bg-dark d-md-none sticky-top px-3">
-    <div class="container-fluid p-0">
-      <span class="navbar-brand fw-bold fs-6">
-        <i class="fas fa-school text-primary me-2"></i>E-Presensi
-      </span>
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+  <!-- NAVBAR HEADER MOBILE (Hanya Tampil di HP) -->
+  <nav class="navbar navbar-dark bg-dark d-md-none sticky-top px-3 py-2">
+    <div class="container-fluid p-0 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-2">
+        <i class="fas fa-school text-primary fs-5"></i>
+        <div>
+          <div class="fw-bold text-white small txtNamaUser" style="line-height: 1.1;">-</div>
+          <span class="badge bg-primary text-uppercase px-1 py-0 txtRoleUser" style="font-size: 0.65rem;">-</span>
+        </div>
+      </div>
+      <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
         <span class="navbar-toggler-icon"></span>
       </button>
     </div>
   </nav>
 
-  <!-- OFFCANVAS SIDEBAR FOR MOBILE -->
+  <!-- OFFCANVAS SIDEBAR FOR MOBILE (Drawer Slide Samping) -->
   <div class="offcanvas offcanvas-start bg-dark text-white d-md-none" tabindex="-1" id="mobileSidebar">
     <div class="offcanvas-header border-bottom border-secondary">
-      <h5 class="offcanvas-title fw-bold"><i class="fas fa-school text-primary me-2"></i>Menu Navigasi</h5>
+      <h5 class="offcanvas-title fw-bold"><i class="fas fa-bars text-primary me-2"></i>Menu Navigasi</h5>
       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body sidebar">
-      <div class="mb-4 px-2">
-        <small class="text-muted text-uppercase fw-bold d-block">Pengguna</small>
-        <span class="fw-bold d-block text-white txtNamaUser">-</span>
-        <span class="badge bg-primary mt-1 txtRoleUser">-</span>
-      </div>
       <ul class="nav nav-pills flex-column menuListContainer">
-        <!-- Render Menu dari JS -->
+        <!-- Menu Otomatis Didesain di JS -->
       </ul>
     </div>
   </div>
 
   <div class="container-fluid">
     <div class="row">
-      <!-- SIDEBAR DESKTOP -->
+      <!-- SIDEBAR DESKTOP (Hanya Tampil di Laptop/Tablet) -->
       <div class="col-md-3 col-lg-2 sidebar p-3 d-none d-md-block">
         <div class="d-flex align-items-center gap-2 mb-4 px-2">
           <i class="fas fa-school text-primary fa-2x"></i>
@@ -145,16 +142,49 @@
         </div>
 
         <ul class="nav nav-pills flex-column menuListContainer">
-          <!-- Render Menu dari JS -->
+          <!-- Menu Otomatis Didesain di JS -->
         </ul>
       </div>
 
       <!-- CONTENT AREA -->
-      <div class="col-md-9 col-lg-10 main-content p-3 p-md-4">
+      <div class="col-md-9 col-lg-10 main-content p-2 p-md-4">
+
+        <!-- PRESENSI KAMERA GURU (DESAIN COMPACT MOBILE FIRST) -->
+        <div id="pageAbsenGuru" class="page-content d-none">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-5 text-center">
+              <div class="card border-0 shadow-sm p-3 rounded-4 card-mobile-compact">
+                <h6 class="fw-bold mb-2 text-dark"><i class="fas fa-camera text-primary me-2"></i>Presensi Kamera</h6>
+                
+                <div class="d-flex justify-content-center">
+                  <video id="webcamVideo" autoplay playsinline></video>
+                </div>
+                <canvas id="canvasFoto"></canvas>
+
+                <div class="status-gps-box my-2" id="txtStatusGPS">
+                  <span class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Mendeteksi Lokasi GPS...</span>
+                </div>
+
+                <div class="row g-2 justify-content-center">
+                  <div class="col-6">
+                    <button class="btn btn-success w-100 btn-mobile-lg rounded-3" onclick="eksekusiAbsen('CHECK_IN')">
+                      <i class="fas fa-sign-in-alt me-1"></i> Check-In
+                    </button>
+                  </div>
+                  <div class="col-6">
+                    <button class="btn btn-warning text-white w-100 btn-mobile-lg rounded-3" onclick="eksekusiAbsen('CHECK_OUT')">
+                      <i class="fas fa-sign-out-alt me-1"></i> Check-Out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- DASHBOARD ADMIN -->
         <div id="pageDashboard" class="page-content d-none">
-          <div class="row g-2 g-md-3 mb-4">
+          <div class="row g-2 g-md-3 mb-3">
             <div class="col-6 col-md-3">
               <div class="card border-0 shadow-sm bg-primary text-white p-3">
                 <span class="small fw-bold">TOTAL GURU</span>
@@ -181,55 +211,45 @@
             </div>
           </div>
 
-          <!-- GRAFIK KEHADIRAN BULANAN -->
           <div class="card border-0 shadow-sm p-3 p-md-4">
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3 gap-2">
-              <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-chart-line text-primary me-2"></i>Grafik Kehadiran Guru Bulanan</h5>
+              <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-chart-line text-primary me-2"></i>Grafik Kehadiran Guru</h5>
               <div class="d-flex align-items-center gap-2">
                 <label class="form-label mb-0 small fw-bold">Bulan:</label>
                 <input type="month" id="filterBulanGrafik" class="form-control form-control-sm" onchange="muatGrafikDashboard()">
               </div>
             </div>
-            <div style="position: relative; height:280px; width:100%">
+            <div style="position: relative; height:260px; width:100%">
               <canvas id="chartKehadiran"></canvas>
             </div>
           </div>
         </div>
 
-        <!-- REKAP HARIAN / BULANAN ADMIN -->
+        <!-- REKAP PRESENSI ADMIN -->
         <div id="pageRekapHarian" class="page-content d-none">
           <div class="card border-0 shadow-sm p-3 p-md-4">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
               <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-calendar-check text-primary me-2"></i>Rekap Presensi Guru</h5>
-              
               <div class="d-flex gap-2">
-                <button class="btn btn-success btn-sm fw-bold" onclick="downloadExcel()">
-                  <i class="fas fa-file-excel me-1"></i> Excel
-                </button>
-                <button class="btn btn-danger btn-sm fw-bold" onclick="downloadPDF()">
-                  <i class="fas fa-file-pdf me-1"></i> PDF
-                </button>
+                <button class="btn btn-success btn-sm fw-bold" onclick="downloadExcel()"><i class="fas fa-file-excel me-1"></i> Excel</button>
+                <button class="btn btn-danger btn-sm fw-bold" onclick="downloadPDF()"><i class="fas fa-file-pdf me-1"></i> PDF</button>
               </div>
             </div>
 
-            <!-- FILTER DATA -->
-            <div class="row g-2 mb-4 bg-light p-3 rounded-3 align-items-end">
+            <div class="row g-2 mb-3 bg-light p-2 rounded-3 align-items-end">
               <div class="col-12 col-md-4">
-                <label class="form-label fw-bold small">Filter Tanggal (Harian):</label>
+                <label class="form-label fw-bold small mb-1">Filter Harian:</label>
                 <input type="date" id="filterTglRekap" class="form-control form-control-sm" onchange="resetFilterBulan(); muatRekapHarian();">
               </div>
               <div class="col-12 col-md-4">
-                <label class="form-label fw-bold small">Atau Filter Bulan (Tgl 1-31):</label>
+                <label class="form-label fw-bold small mb-1">Filter Bulanan:</label>
                 <input type="month" id="filterBulanRekap" class="form-control form-control-sm" onchange="resetFilterTanggal(); muatRekapHarian();">
               </div>
               <div class="col-12 col-md-4">
-                <button class="btn btn-primary btn-sm w-100 fw-bold" onclick="setHariIni(true)">
-                  <i class="fas fa-sync-alt me-1"></i> Reset ke Hari Ini
-                </button>
+                <button class="btn btn-primary btn-sm w-100 fw-bold" onclick="setHariIni(true)"><i class="fas fa-sync-alt me-1"></i> Reset Hari Ini</button>
               </div>
             </div>
 
-            <!-- TABEL REKAP -->
             <div id="areaCetak">
               <div class="d-none d-print-block mb-3 text-center">
                 <h4>LAPORAN REKAP PRESENSI GURU</h4>
@@ -239,47 +259,11 @@
                 <table class="table table-hover align-middle table-bordered" id="tabelRekapData">
                   <thead class="table-dark text-center">
                     <tr>
-                      <th style="width: 40px;">No</th>
-                      <th style="width: 100px;">Tanggal</th>
-                      <th style="width: 100px;">NIP</th>
-                      <th>Nama Guru</th>
-                      <th style="width: 100px;">Status</th>
-                      <th style="width: 90px;">Check-In</th>
-                      <th style="width: 90px;">Check-Out</th>
-                      <th style="width: 110px;" class="d-print-none">Bukti Foto</th>
+                      <th>No</th><th>Tanggal</th><th>NIP</th><th>Nama Guru</th><th>Status</th><th>Check-In</th><th>Check-Out</th><th class="d-print-none">Foto</th>
                     </tr>
                   </thead>
                   <tbody id="tbRekapHarian"></tbody>
                 </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PRESENSI KAMERA GURU -->
-        <div id="pageAbsenGuru" class="page-content d-none">
-          <div class="row justify-content-center">
-            <div class="col-12 col-md-8 col-lg-6 text-center">
-              <div class="card border-0 shadow-lg p-3 p-md-4 rounded-4">
-                <h5 class="fw-bold mb-3 fs-6 fs-md-5"><i class="fas fa-camera text-primary me-2"></i>Kamera Presensi</h5>
-                
-                <div class="d-flex justify-content-center">
-                  <video id="webcamVideo" autoplay playsinline></video>
-                </div>
-                <canvas id="canvasFoto"></canvas>
-
-                <div class="my-3" id="txtStatusGPS">
-                  <span class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Mendeteksi Lokasi GPS...</span>
-                </div>
-
-                <div class="d-flex gap-2 justify-content-center mt-2">
-                  <button class="btn btn-success btn-lg btn-lg-mobile fw-bold flex-grow-1" onclick="eksekusiAbsen('CHECK_IN')">
-                    <i class="fas fa-sign-in-alt me-1"></i> Check-In
-                  </button>
-                  <button class="btn btn-warning text-white btn-lg btn-lg-mobile fw-bold flex-grow-1" onclick="eksekusiAbsen('CHECK_OUT')">
-                    <i class="fas fa-sign-out-alt me-1"></i> Check-Out
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -292,13 +276,7 @@
             <div class="table-responsive">
               <table class="table table-hover align-middle">
                 <thead class="table-dark">
-                  <tr>
-                    <th>Tanggal</th>
-                    <th>Tipe</th>
-                    <th>Jam</th>
-                    <th>Lokasi (Lat, Lng)</th>
-                    <th>Foto</th>
-                  </tr>
+                  <tr><th>Tanggal</th><th>Tipe</th><th>Jam</th><th>Lokasi</th><th>Foto</th></tr>
                 </thead>
                 <tbody id="tbRiwayatGuru"></tbody>
               </table>
@@ -311,14 +289,12 @@
           <div class="card border-0 shadow-sm p-3 p-md-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-users-cog text-primary me-2"></i>Kelola Data Guru</h5>
-              <button class="btn btn-primary btn-sm btn-md-normal fw-bold" onclick="bukaModalGuru()"><i class="fas fa-plus me-1"></i> Tambah</button>
+              <button class="btn btn-primary btn-sm fw-bold" onclick="bukaModalGuru()"><i class="fas fa-plus me-1"></i> Tambah</button>
             </div>
             <div class="table-responsive">
               <table class="table table-hover align-middle">
                 <thead class="table-dark">
-                  <tr>
-                    <th>No</th><th>NIP/ID</th><th>Nama</th><th>Username</th><th>Role</th><th>No HP</th><th>Mapel</th><th>Aksi</th>
-                  </tr>
+                  <tr><th>No</th><th>NIP</th><th>Nama</th><th>Username</th><th>Role</th><th>No HP</th><th>Mapel</th><th>Aksi</th></tr>
                 </thead>
                 <tbody id="tbDataGuru"></tbody>
               </table>
@@ -478,24 +454,24 @@
     if (currentUser.role.toLowerCase() === 'admin') {
       html += `
         <li class="nav-item">
-          <a class="nav-link active" onclick="navigasi('dashboard')"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+          <a class="nav-link nav-dashboard" onclick="navigasi('dashboard')"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigasi('rekapHarian')"><i class="fas fa-calendar-check me-2"></i> Rekap Presensi</a>
+          <a class="nav-link nav-rekapHarian" onclick="navigasi('rekapHarian')"><i class="fas fa-calendar-check me-2"></i> Rekap Presensi</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigasi('dataGuru')"><i class="fas fa-users-cog me-2"></i> Data Guru</a>
+          <a class="nav-link nav-dataGuru" onclick="navigasi('dataGuru')"><i class="fas fa-users-cog me-2"></i> Data Guru</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigasi('settingAbsen')"><i class="fas fa-sliders-h me-2"></i> Setting Absen</a>
+          <a class="nav-link nav-settingAbsen" onclick="navigasi('settingAbsen')"><i class="fas fa-sliders-h me-2"></i> Setting Absen</a>
         </li>`;
     } else {
       html += `
         <li class="nav-item">
-          <a class="nav-link active" onclick="navigasi('absenGuru')"><i class="fas fa-camera me-2"></i> Presensi Kamera</a>
+          <a class="nav-link nav-absenGuru" onclick="navigasi('absenGuru')"><i class="fas fa-camera me-2"></i> Presensi Kamera</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigasi('riwayatGuru')"><i class="fas fa-history me-2"></i> Riwayat Presensi</a>
+          <a class="nav-link nav-riwayatGuru" onclick="navigasi('riwayatGuru')"><i class="fas fa-history me-2"></i> Riwayat Presensi</a>
         </li>`;
     }
 
@@ -531,11 +507,15 @@
   function navigasi(page) {
     $('.page-content').addClass('d-none');
     $('.sidebar .nav-link').removeClass('active');
+    $('.nav-' + page).addClass('active');
 
-    // Sembunyikan Offcanvas di mobile jika terbuka
+    // Otomatis Tutup Drawer Sidebar Mobile Jika Terbuka
     let offcanvasEl = document.getElementById('mobileSidebar');
     let bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
     if (bsOffcanvas) bsOffcanvas.hide();
+
+    // Scroll ke Paling Atas Otomatis
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (page === 'dashboard') {
       $('#pageDashboard').removeClass('d-none');
@@ -688,7 +668,6 @@
     if (autoLoad) muatRekapHarian();
   }
 
-  /* DOWNLOAD EXCEL & PDF */
   function downloadExcel() {
     if (currentRekapData.length === 0) {
       Swal.fire('Peringatan', 'Tidak ada data untuk diunduh!', 'warning');
@@ -750,10 +729,10 @@
     navigator.geolocation.getCurrentPosition(
       function(pos) {
         userCoords = `${pos.coords.latitude},${pos.coords.longitude}`;
-        $('#txtStatusGPS').html(`<span class="text-success"><i class="fas fa-check-circle me-1"></i> GPS Terdeteksi</span>`);
+        $('#txtStatusGPS').html(`<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> GPS Terdeteksi</span>`);
       },
       function(err) {
-        $('#txtStatusGPS').html(`<span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> GPS Gagal: Aktifkan Lokasi</span>`);
+        $('#txtStatusGPS').html(`<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-1"></i> GPS Gagal: Aktifkan Lokasi</span>`);
       },
       { enableHighAccuracy: true }
     );
@@ -924,7 +903,7 @@
     });
   }
 
-  /* SETTING ABSEN (ADMIN) */
+  /* SETTING ABSEN ADMIN */
   function muatSettingAbsen() {
     apiGet("action=getSetting").done(function(res) {
       if (res.status === 'BERHASIL') {
