@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SISTEM E-ABSENSI DINAS BM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SISTEM E-ABSENSI DINAS BM </title>
   
   <!-- CSS Library -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,44 +14,84 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .sidebar { min-height: 100vh; background: #1e293b; color: white; }
-    .sidebar .nav-link { color: #94a3b8; padding: 12px 20px; font-weight: 500; border-radius: 8px; margin-bottom: 4px; cursor: pointer; }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active { color: white; background: #334155; }
-    #webcamVideo { width: 100%; max-width: 400px; height: auto; border-radius: 12px; background: #000; transform: scaleX(-1); }
+    :root {
+      --sidebar-width: 260px;
+    }
+    body { 
+      background-color: #f4f6f9; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Layout Desktop */
+    .sidebar { 
+      min-height: 100vh; 
+      background: #1e293b; 
+      color: white; 
+    }
+    .sidebar .nav-link { 
+      color: #94a3b8; 
+      padding: 12px 18px; 
+      font-weight: 500; 
+      border-radius: 8px; 
+      margin-bottom: 4px; 
+      cursor: pointer; 
+      transition: all 0.2s ease;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { 
+      color: white; 
+      background: #334155; 
+    }
+    
+    /* Webcam Kamera Responsif */
+    #webcamVideo { 
+      width: 100%; 
+      max-width: 400px; 
+      height: auto; 
+      border-radius: 16px; 
+      background: #000; 
+      transform: scaleX(-1); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
     #canvasFoto { display: none; }
+
+    /* Penyesuaian Mobile / Smartphone */
+    @media (max-width: 767.98px) {
+      .sidebar { min-height: auto; }
+      .main-content { padding: 15px !important; }
+      .card { border-radius: 12px !important; }
+      .table-responsive { font-size: 0.85rem; }
+      .btn-lg-mobile { padding: 12px 16px; font-size: 1rem; }
+    }
   </style>
 </head>
 <body>
 
 <!-- LOGIN CONTAINER -->
-<div id="sectionLogin" class="container py-5">
-  <div class="row justify-content-center py-5">
-    <div class="col-12 col-md-5">
+<div id="sectionLogin" class="container py-4 py-md-5">
+  <div class="row justify-content-center py-2 py-md-5">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
       <div class="card border-0 shadow-lg rounded-4 p-4">
         <div class="text-center mb-4">
           <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
-            <i class="fas fa-user-lock fa-2x"></i>
+            <i class="fas fa-user-check fa-2x"></i>
           </div>
-          <h4 class="fw-bold">LOGIN SISTEM</h4>
-          <p class="text-muted small">E-ABSENSI 5.0 Guru Dinas BM</p>
+          <h4 class="fw-bold">Presensi Guru</h4>
+          <p class="text-muted small">Silakan login untuk mengakses sistem</p>
         </div>
         <form id="formLogin" onsubmit="prosesLogin(event)">
           <div class="mb-3">
-            <label class="form-label fw-semibold">USERNAME/ NUPTK</label>
+            <label class="form-label fw-semibold">Username</label>
             <input type="text" id="loginUser" class="form-control form-control-lg" required placeholder="Masukkan username">
           </div>
           <div class="mb-4">
-            <label class="form-label fw-semibold">PASSWORD</label>
+            <label class="form-label fw-semibold">Password</label>
             <input type="password" id="loginPass" class="form-control form-control-lg" required placeholder="Masukkan password">
           </div>
           <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold rounded-3">
             <i class="fas fa-sign-in-alt me-2"></i> Masuk
           </button>
         </form>
-        </div>
-        <div class="text-center mt-4">
-        <small class="text-muted">&copy; 2026 Absensi SMA-BM</small>
       </div>
     </div>
   </div>
@@ -59,91 +99,98 @@
 
 <!-- MAIN APP CONTAINER -->
 <div id="sectionMainApp" class="d-none">
+  
+  <!-- NAVBAR MOBILE (Hanya tampil di Layar HP) -->
+  <nav class="navbar navbar-dark bg-dark d-md-none sticky-top px-3">
+    <div class="container-fluid p-0">
+      <span class="navbar-brand fw-bold fs-6">
+        <i class="fas fa-school text-primary me-2"></i>E-Presensi
+      </span>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- OFFCANVAS SIDEBAR FOR MOBILE -->
+  <div class="offcanvas offcanvas-start bg-dark text-white d-md-none" tabindex="-1" id="mobileSidebar">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <h5 class="offcanvas-title fw-bold"><i class="fas fa-school text-primary me-2"></i>Menu Navigasi</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body sidebar">
+      <div class="mb-4 px-2">
+        <small class="text-muted text-uppercase fw-bold d-block">Pengguna</small>
+        <span class="fw-bold d-block text-white txtNamaUser">-</span>
+        <span class="badge bg-primary mt-1 txtRoleUser">-</span>
+      </div>
+      <ul class="nav nav-pills flex-column menuListContainer">
+        <!-- Render Menu dari JS -->
+      </ul>
+    </div>
+  </div>
+
   <div class="container-fluid">
     <div class="row">
-      <!-- SIDEBAR -->
-      <div class="col-md-3 col-lg-2 sidebar p-3">
+      <!-- SIDEBAR DESKTOP -->
+      <div class="col-md-3 col-lg-2 sidebar p-3 d-none d-md-block">
         <div class="d-flex align-items-center gap-2 mb-4 px-2">
           <i class="fas fa-school text-primary fa-2x"></i>
           <h5 class="fw-bold mb-0">E-Presensi</h5>
         </div>
         <div class="mb-4 px-2">
           <small class="text-muted text-uppercase fw-bold d-block">Pengguna</small>
-          <span class="fw-bold d-block text-white" id="txtNamaUser">-</span>
-          <span class="badge bg-primary mt-1" id="txtRoleUser">-</span>
+          <span class="fw-bold d-block text-white txtNamaUser">-</span>
+          <span class="badge bg-primary mt-1 txtRoleUser">-</span>
         </div>
 
-        <ul class="nav nav-pills flex-column">
-          <!-- ADMIN MENU -->
-          <li class="nav-item menu-admin d-none">
-            <a class="nav-link active" onclick="navigasi('dashboard')"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
-          </li>
-          <li class="nav-item menu-admin d-none">
-            <a class="nav-link" onclick="navigasi('rekapHarian')"><i class="fas fa-calendar-check me-2"></i> Rekap Presensi</a>
-          </li>
-          <li class="nav-item menu-admin d-none">
-            <a class="nav-link" onclick="navigasi('dataGuru')"><i class="fas fa-users-cog me-2"></i> Data Guru</a>
-          </li>
-          <li class="nav-item menu-admin d-none">
-            <a class="nav-link" onclick="navigasi('settingAbsen')"><i class="fas fa-sliders-h me-2"></i> Setting Absen</a>
-          </li>
-
-          <!-- GURU MENU -->
-          <li class="nav-item menu-guru d-none">
-            <a class="nav-link" onclick="navigasi('absenGuru')"><i class="fas fa-camera me-2"></i> Presensi Kamera</a>
-          </li>
-          <li class="nav-item menu-guru d-none">
-            <a class="nav-link" onclick="navigasi('riwayatGuru')"><i class="fas fa-history me-2"></i> Riwayat Presensi</a>
-          </li>
-
-          <li class="nav-item mt-4">
-            <a class="nav-link text-danger" onclick="prosesLogout()"><i class="fas fa-sign-out-alt me-2"></i> Keluar</a>
-          </li>
+        <ul class="nav nav-pills flex-column menuListContainer">
+          <!-- Render Menu dari JS -->
         </ul>
       </div>
 
       <!-- CONTENT AREA -->
-      <div class="col-md-9 col-lg-10 p-4">
+      <div class="col-md-9 col-lg-10 main-content p-3 p-md-4">
 
         <!-- DASHBOARD ADMIN -->
         <div id="pageDashboard" class="page-content d-none">
-          <div class="row g-3 mb-4">
-            <div class="col-md-3">
+          <div class="row g-2 g-md-3 mb-4">
+            <div class="col-6 col-md-3">
               <div class="card border-0 shadow-sm bg-primary text-white p-3">
                 <span class="small fw-bold">TOTAL GURU</span>
                 <h2 class="fw-bold mb-0" id="cardTotalGuru">0</h2>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
               <div class="card border-0 shadow-sm bg-info text-white p-3">
                 <span class="small fw-bold">TOTAL ADMIN</span>
                 <h2 class="fw-bold mb-0" id="cardTotalAdmin">0</h2>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
               <div class="card border-0 shadow-sm bg-success text-white p-3">
                 <span class="small fw-bold">HADIR HARI INI</span>
                 <h2 class="fw-bold mb-0" id="cardHadirHariIni">0</h2>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
               <div class="card border-0 shadow-sm bg-danger text-white p-3">
-                <span class="small fw-bold">TIDAK HADIR HARI INI</span>
+                <span class="small fw-bold">TIDAK HADIR</span>
                 <h2 class="fw-bold mb-0" id="cardAbsenHariIni">0</h2>
               </div>
             </div>
           </div>
 
           <!-- GRAFIK KEHADIRAN BULANAN -->
-          <div class="card border-0 shadow-sm p-4">
-            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-              <h5 class="fw-bold mb-0"><i class="fas fa-chart-line text-primary me-2"></i>Grafik Kehadiran Guru Bulanan</h5>
+          <div class="card border-0 shadow-sm p-3 p-md-4">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3 gap-2">
+              <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-chart-line text-primary me-2"></i>Grafik Kehadiran Guru Bulanan</h5>
               <div class="d-flex align-items-center gap-2">
-                <label class="form-label mb-0 small fw-bold">Pilih Bulan:</label>
+                <label class="form-label mb-0 small fw-bold">Bulan:</label>
                 <input type="month" id="filterBulanGrafik" class="form-control form-control-sm" onchange="muatGrafikDashboard()">
               </div>
             </div>
-            <div style="position: relative; height:320px; width:100%">
+            <div style="position: relative; height:280px; width:100%">
               <canvas id="chartKehadiran"></canvas>
             </div>
           </div>
@@ -151,11 +198,10 @@
 
         <!-- REKAP HARIAN / BULANAN ADMIN -->
         <div id="pageRekapHarian" class="page-content d-none">
-          <div class="card border-0 shadow-sm p-4">
+          <div class="card border-0 shadow-sm p-3 p-md-4">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-              <h5 class="fw-bold mb-0"><i class="fas fa-calendar-check text-primary me-2"></i>Rekap Presensi Guru</h5>
+              <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-calendar-check text-primary me-2"></i>Rekap Presensi Guru</h5>
               
-              <!-- FITUR DOWNLOAD -->
               <div class="d-flex gap-2">
                 <button class="btn btn-success btn-sm fw-bold" onclick="downloadExcel()">
                   <i class="fas fa-file-excel me-1"></i> Excel
@@ -168,15 +214,15 @@
 
             <!-- FILTER DATA -->
             <div class="row g-2 mb-4 bg-light p-3 rounded-3 align-items-end">
-              <div class="col-md-4">
-                <label class="form-label fw-bold small">Filter Per Tanggal (Harian):</label>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold small">Filter Tanggal (Harian):</label>
                 <input type="date" id="filterTglRekap" class="form-control form-control-sm" onchange="resetFilterBulan(); muatRekapHarian();">
               </div>
-              <div class="col-md-4">
-                <label class="form-label fw-bold small">Atau Filter Per Bulan (Tgl 1-31):</label>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold small">Atau Filter Bulan (Tgl 1-31):</label>
                 <input type="month" id="filterBulanRekap" class="form-control form-control-sm" onchange="resetFilterTanggal(); muatRekapHarian();">
               </div>
-              <div class="col-md-4">
+              <div class="col-12 col-md-4">
                 <button class="btn btn-primary btn-sm w-100 fw-bold" onclick="setHariIni(true)">
                   <i class="fas fa-sync-alt me-1"></i> Reset ke Hari Ini
                 </button>
@@ -193,14 +239,14 @@
                 <table class="table table-hover align-middle table-bordered" id="tabelRekapData">
                   <thead class="table-dark text-center">
                     <tr>
-                      <th style="width: 50px;">No</th>
-                      <th style="width: 110px;">Tanggal</th>
-                      <th style="width: 120px;">NIP</th>
+                      <th style="width: 40px;">No</th>
+                      <th style="width: 100px;">Tanggal</th>
+                      <th style="width: 100px;">NIP</th>
                       <th>Nama Guru</th>
-                      <th style="width: 120px;">Status</th>
-                      <th style="width: 100px;">Check-In</th>
-                      <th style="width: 100px;">Check-Out</th>
-                      <th style="width: 130px;" class="d-print-none">Bukti Foto</th>
+                      <th style="width: 100px;">Status</th>
+                      <th style="width: 90px;">Check-In</th>
+                      <th style="width: 90px;">Check-Out</th>
+                      <th style="width: 110px;" class="d-print-none">Bukti Foto</th>
                     </tr>
                   </thead>
                   <tbody id="tbRekapHarian"></tbody>
@@ -213,10 +259,13 @@
         <!-- PRESENSI KAMERA GURU -->
         <div id="pageAbsenGuru" class="page-content d-none">
           <div class="row justify-content-center">
-            <div class="col-md-6 text-center">
-              <div class="card border-0 shadow-lg p-4 rounded-4">
-                <h5 class="fw-bold mb-3"><i class="fas fa-camera text-primary me-2"></i>Kamera Presensi</h5>
-                <video id="webcamVideo" autoplay playsinline></video>
+            <div class="col-12 col-md-8 col-lg-6 text-center">
+              <div class="card border-0 shadow-lg p-3 p-md-4 rounded-4">
+                <h5 class="fw-bold mb-3 fs-6 fs-md-5"><i class="fas fa-camera text-primary me-2"></i>Kamera Presensi</h5>
+                
+                <div class="d-flex justify-content-center">
+                  <video id="webcamVideo" autoplay playsinline></video>
+                </div>
                 <canvas id="canvasFoto"></canvas>
 
                 <div class="my-3" id="txtStatusGPS">
@@ -224,10 +273,10 @@
                 </div>
 
                 <div class="d-flex gap-2 justify-content-center mt-2">
-                  <button class="btn btn-success btn-lg fw-bold flex-grow-1" onclick="eksekusiAbsen('CHECK_IN')">
+                  <button class="btn btn-success btn-lg btn-lg-mobile fw-bold flex-grow-1" onclick="eksekusiAbsen('CHECK_IN')">
                     <i class="fas fa-sign-in-alt me-1"></i> Check-In
                   </button>
-                  <button class="btn btn-warning text-white btn-lg fw-bold flex-grow-1" onclick="eksekusiAbsen('CHECK_OUT')">
+                  <button class="btn btn-warning text-white btn-lg btn-lg-mobile fw-bold flex-grow-1" onclick="eksekusiAbsen('CHECK_OUT')">
                     <i class="fas fa-sign-out-alt me-1"></i> Check-Out
                   </button>
                 </div>
@@ -238,8 +287,8 @@
 
         <!-- RIWAYAT PRESENSI GURU -->
         <div id="pageRiwayatGuru" class="page-content d-none">
-          <div class="card border-0 shadow-sm p-4">
-            <h5 class="fw-bold mb-3"><i class="fas fa-history text-primary me-2"></i>Riwayat Presensi Saya</h5>
+          <div class="card border-0 shadow-sm p-3 p-md-4">
+            <h5 class="fw-bold mb-3 fs-6 fs-md-5"><i class="fas fa-history text-primary me-2"></i>Riwayat Presensi Saya</h5>
             <div class="table-responsive">
               <table class="table table-hover align-middle">
                 <thead class="table-dark">
@@ -259,10 +308,10 @@
 
         <!-- DATA GURU ADMIN -->
         <div id="pageDataGuru" class="page-content d-none">
-          <div class="card border-0 shadow-sm p-4">
+          <div class="card border-0 shadow-sm p-3 p-md-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="fw-bold mb-0"><i class="fas fa-users-cog text-primary me-2"></i>Kelola Data Guru</h5>
-              <button class="btn btn-primary fw-bold" onclick="bukaModalGuru()"><i class="fas fa-plus me-1"></i> Tambah Guru</button>
+              <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-users-cog text-primary me-2"></i>Kelola Data Guru</h5>
+              <button class="btn btn-primary btn-sm btn-md-normal fw-bold" onclick="bukaModalGuru()"><i class="fas fa-plus me-1"></i> Tambah</button>
             </div>
             <div class="table-responsive">
               <table class="table table-hover align-middle">
@@ -280,9 +329,9 @@
         <!-- SETTING ABSEN ADMIN -->
         <div id="pageSettingAbsen" class="page-content d-none">
           <div class="row justify-content-center">
-            <div class="col-md-8">
-              <div class="card border-0 shadow-sm p-4">
-                <h5 class="fw-bold mb-3"><i class="fas fa-sliders-h text-primary me-2"></i>Pengaturan Lokasi & Radius Absensi</h5>
+            <div class="col-12 col-md-8">
+              <div class="card border-0 shadow-sm p-3 p-md-4">
+                <h5 class="fw-bold mb-3 fs-6 fs-md-5"><i class="fas fa-sliders-h text-primary me-2"></i>Pengaturan Lokasi & Radius</h5>
                 <form id="formSettingAbsen" onsubmit="simpanSettingAbsen(event)">
                   <div class="mb-3">
                     <label class="form-label fw-bold">Latitude Sekolah</label>
@@ -296,7 +345,7 @@
                     <label class="form-label fw-bold">Radius Toleransi (Meter)</label>
                     <input type="number" id="setRadius" class="form-control" required placeholder="500">
                   </div>
-                  <button type="button" class="btn btn-outline-secondary mb-3" onclick="isiGPSHariIni()">
+                  <button type="button" class="btn btn-outline-secondary mb-3 w-100" onclick="isiGPSHariIni()">
                     <i class="fas fa-map-marker-alt me-1"></i> Gunakan Lokasi Saya Saat Ini
                   </button>
                   <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Pengaturan</button>
@@ -313,7 +362,7 @@
 
 <!-- MODAL FORM GURU -->
 <div class="modal fade" id="modalFormGuru" tabindex="-1">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title fw-bold" id="modalGuruTitle">Tambah Guru</h5>
@@ -424,17 +473,51 @@
     });
   }
 
+  function renderMenuNavigasi() {
+    let html = '';
+    if (currentUser.role.toLowerCase() === 'admin') {
+      html += `
+        <li class="nav-item">
+          <a class="nav-link active" onclick="navigasi('dashboard')"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigasi('rekapHarian')"><i class="fas fa-calendar-check me-2"></i> Rekap Presensi</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigasi('dataGuru')"><i class="fas fa-users-cog me-2"></i> Data Guru</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigasi('settingAbsen')"><i class="fas fa-sliders-h me-2"></i> Setting Absen</a>
+        </li>`;
+    } else {
+      html += `
+        <li class="nav-item">
+          <a class="nav-link active" onclick="navigasi('absenGuru')"><i class="fas fa-camera me-2"></i> Presensi Kamera</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigasi('riwayatGuru')"><i class="fas fa-history me-2"></i> Riwayat Presensi</a>
+        </li>`;
+    }
+
+    html += `
+      <li class="nav-item mt-4">
+        <a class="nav-link text-danger" onclick="prosesLogout()"><i class="fas fa-sign-out-alt me-2"></i> Keluar</a>
+      </li>`;
+
+    $('.menuListContainer').html(html);
+  }
+
   function bukaAplikasi() {
     $('#sectionLogin').addClass('d-none');
     $('#sectionMainApp').removeClass('d-none');
-    $('#txtNamaUser').text(currentUser.nama);
-    $('#txtRoleUser').text(currentUser.role);
+    $('.txtNamaUser').text(currentUser.nama);
+    $('.txtRoleUser').text(currentUser.role);
+
+    renderMenuNavigasi();
 
     if (currentUser.role.toLowerCase() === 'admin') {
-      $('.menu-admin').removeClass('d-none');
       navigasi('dashboard');
     } else {
-      $('.menu-guru').removeClass('d-none');
       navigasi('absenGuru');
     }
   }
@@ -448,6 +531,11 @@
   function navigasi(page) {
     $('.page-content').addClass('d-none');
     $('.sidebar .nav-link').removeClass('active');
+
+    // Sembunyikan Offcanvas di mobile jika terbuka
+    let offcanvasEl = document.getElementById('mobileSidebar');
+    let bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+    if (bsOffcanvas) bsOffcanvas.hide();
 
     if (page === 'dashboard') {
       $('#pageDashboard').removeClass('d-none');
