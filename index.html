@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Presensi Guru Mandiri</title>
+  <title>SISTEM E-ABSENSI DINAS UPT</title>
   
   <!-- CSS Library -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,8 +15,8 @@
 
   <style>
     body { 
-      background-color: #0f172a; 
-      color: #f8fafc;
+      background-color: #f4f6f9; 
+      color: #1e293b;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
       -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
@@ -111,7 +111,7 @@
     /* Optimization Khusus Layar Mobile (HP) */
     @media (max-width: 767.98px) {
       .main-content { 
-        padding: 12px 12px 80px 12px !important; 
+        padding: 12px 12px 80px 12px !important; /* Padding bawah disesuaikan agar tidak tertutup bottom nav */
       }
       .card-mobile-compact { padding: 15px 12px !important; margin-bottom: 0 !important; }
       .btn-mobile-lg { padding: 12px; font-size: 0.95rem; font-weight: bold; }
@@ -128,24 +128,27 @@
       <div class="card card-dark shadow-lg rounded-4 p-4">
         <div class="text-center mb-4">
           <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
-            <i class="fas fa-user-check fa-2x"></i>
+            <i class="fas fa-user-lock fa-2x"></i>
           </div>
-          <h4 class="fw-bold">Presensi Guru</h4>
-          <p class="text-muted small">Silakan login untuk mengakses sistem</p>
+          <h4 class="fw-bold">LOGIN SISTEM</h4>
+          <p class="text-white small">Presensi Dinas SMA-BM</p>
         </div>
         <form id="formLogin" onsubmit="prosesLogin(event)">
           <div class="mb-3">
-            <label class="form-label fw-semibold">Username</label>
+            <label class="form-label fw-semibold">USERNAME/NUPTK</label>
             <input type="text" id="loginUser" class="form-control form-control-lg bg-dark text-white border-secondary" required placeholder="Masukkan username">
           </div>
           <div class="mb-4">
-            <label class="form-label fw-semibold">Password</label>
+            <label class="form-label fw-semibold">PASSWORD</label>
             <input type="password" id="loginPass" class="form-control form-control-lg bg-dark text-white border-secondary" required placeholder="Masukkan password">
           </div>
           <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold rounded-3">
             <i class="fas fa-sign-in-alt me-2"></i> Masuk
           </button>
         </form>
+        <div class="text-center mt-4">
+        <small class="text-white small">&copy; 2026 Absensi SMA-BM</small>
+      </div>
       </div>
     </div>
   </div>
@@ -192,7 +195,7 @@
           <h5 class="fw-bold mb-0">E-Presensi</h5>
         </div>
         <div class="mb-4 px-2">
-          <small class="text-muted text-uppercase fw-bold d-block">Pengguna</small>
+          <small class="text-white text-uppercase fw-bold d-block">USER</small>
           <span class="fw-bold d-block text-white txtNamaUser">-</span>
           <span class="badge bg-primary mt-1 txtRoleUser">-</span>
         </div>
@@ -205,7 +208,7 @@
       <!-- CONTENT AREA -->
       <div class="col-md-9 col-lg-10 main-content p-2 p-md-4">
 
-        <!-- PRESENSI KAMERA GURU -->
+        <!-- PRESENSI KAMERA GURU (NO-SCROLL LAYAR HP) -->
         <div id="pageAbsenGuru" class="page-content d-none">
           <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-5 text-center">
@@ -220,19 +223,18 @@
                 </div>
                 <canvas id="canvasFoto"></canvas>
 
-                <!-- STATUS GPS REALTIME DENGAN INFO RADIUS -->
-                <div class="status-gps-box my-2 p-2 rounded-3 bg-dark border border-secondary" id="txtStatusGPS">
+                <div class="status-gps-box my-2" id="txtStatusGPS">
                   <span class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Mendeteksi Lokasi GPS...</span>
                 </div>
 
                 <div class="row g-2 justify-content-center">
                   <div class="col-6">
-                    <button class="btn btn-success w-100 btn-mobile-lg rounded-3" id="btnCheckIn" onclick="eksekusiAbsen('CHECK_IN')">
+                    <button class="btn btn-success w-100 btn-mobile-lg rounded-3" onclick="eksekusiAbsen('CHECK_IN')">
                       <i class="fas fa-sign-in-alt me-1"></i> Check-In
                     </button>
                   </div>
                   <div class="col-6">
-                    <button class="btn btn-warning text-white w-100 btn-mobile-lg rounded-3" id="btnCheckOut" onclick="eksekusiAbsen('CHECK_OUT')">
+                    <button class="btn btn-warning text-white w-100 btn-mobile-lg rounded-3" onclick="eksekusiAbsen('CHECK_OUT')">
                       <i class="fas fa-sign-out-alt me-1"></i> Check-Out
                     </button>
                   </div>
@@ -249,7 +251,7 @@
             <div class="table-responsive">
               <table class="table table-dark table-hover align-middle">
                 <thead>
-                  <tr><th>Tanggal</th><th>Tipe</th><th>Jam</th><th>Jarak GPS</th><th>Foto</th></tr>
+                  <tr><th>Tanggal</th><th>Tipe</th><th>Jam</th><th>Lokasi</th><th>Foto</th></tr>
                 </thead>
                 <tbody id="tbRiwayatGuru"></tbody>
               </table>
@@ -257,7 +259,7 @@
           </div>
         </div>
 
-        <!-- AKUN / PROFIL GURU -->
+        <!-- AKUN / PROFIL GURU (MOBILE ONLY & DESKTOP) -->
         <div id="pageAkunGuru" class="page-content d-none">
           <div class="row justify-content-center">
             <div class="col-12 col-md-6 col-lg-4 text-center">
@@ -272,15 +274,15 @@
 
                 <ul class="list-group list-group-flush text-start mb-4">
                   <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                    <span class="text-muted">NIP/ID</span>
+                    <span class="text-white">NIP/ID</span>
                     <strong id="txtProfileNip">-</strong>
                   </li>
                   <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                    <span class="text-muted">Mata Pelajaran</span>
+                    <span class="text-white">Mata Pelajaran</span>
                     <strong id="txtProfileMapel">-</strong>
                   </li>
                   <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                    <span class="text-muted">No HP</span>
+                    <span class="text-white">No HP</span>
                     <strong id="txtProfileNoHp">-</strong>
                   </li>
                 </ul>
@@ -340,7 +342,7 @@
         <div id="pageRekapHarian" class="page-content d-none">
           <div class="card card-dark shadow-sm p-3 p-md-4 rounded-4">
             <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-              <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-calendar-check text-primary me-2"></i>Rekap Presensi Guru</h5>
+              <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-calendar-check text-warning me-2"></i>Rekap Presensi Guru</h5>
               <div class="d-flex gap-2">
                 <button class="btn btn-success btn-sm fw-bold" onclick="downloadExcel()"><i class="fas fa-file-excel me-1"></i> Excel</button>
                 <button class="btn btn-danger btn-sm fw-bold" onclick="downloadPDF()"><i class="fas fa-file-pdf me-1"></i> PDF</button>
@@ -513,7 +515,6 @@
   let cacheGuruList = [];
   let currentRekapData = [];
   let myChartInstance = null;
-  let currentSetting = null;
 
   $(document).ready(function() {
     setHariIni(false);
@@ -542,18 +543,6 @@
       type: "GET",
       dataType: "json"
     });
-  }
-
-  // RUMUS HAVERSINE JS UNTUK HITUNG RADIUS DI FRONTEND
-  function hitungJarakMeterJS(lat1, lon1, lat2, lon2) {
-    const R = 6371000;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return Math.round(R * c);
   }
 
   function prosesLogin(e) {
@@ -646,15 +635,19 @@
   function navigasi(page) {
     $('.page-content').addClass('d-none');
     
+    // Reset State Navigasi
     $('.sidebar .nav-link').removeClass('active');
     $('.bottom-nav-item').removeClass('active');
     
+    // Highlight Active Item
     $('.nav-' + page).addClass('active');
 
+    // Auto close offcanvas sidebar jika terbuka
     let offcanvasEl = document.getElementById('mobileSidebar');
     let bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
     if (bsOffcanvas) bsOffcanvas.hide();
 
+    // Scroll ke Paling Atas Otomatis
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (page === 'dashboard') {
@@ -668,7 +661,7 @@
     } else if (page === 'absenGuru') {
       $('#pageAbsenGuru').removeClass('d-none');
       nyalakanKamera();
-      mintaGPSDanSetting();
+      mintaGPS();
     } else if (page === 'riwayatGuru') {
       $('#pageRiwayatGuru').removeClass('d-none');
       muatRiwayatGuru();
@@ -685,81 +678,6 @@
       muatSettingAbsen();
       matikanKamera();
     }
-  }
-
-  /* CEK SISI FRONTEND UNTUK VALIDASI GPS RADIUS */
-  function mintaGPSDanSetting() {
-    $('#txtStatusGPS').html(`<span class="text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Mendeteksi Lokasi GPS...</span>`);
-    $('#btnCheckIn, #btnCheckOut').prop('disabled', true);
-
-    apiGet("action=getSetting").done(function(res) {
-      if (res.status === 'BERHASIL') {
-        currentSetting = res.data;
-
-        navigator.geolocation.getCurrentPosition(
-          function(pos) {
-            let uLat = pos.coords.latitude;
-            let uLng = pos.coords.longitude;
-            userCoords = `${uLat},${uLng}`;
-
-            let jarak = hitungJarakMeterJS(uLat, uLng, parseFloat(currentSetting.latitude), parseFloat(currentSetting.longitude));
-            let maxRad = parseFloat(currentSetting.radiusMeter);
-
-            if (jarak <= maxRad) {
-              $('#txtStatusGPS').html(`
-                <div class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> Lokasi Sesuai (Dalam Radius)</div>
-                <small class="text-muted">Jarak Anda: <strong>${jarak} m</strong> (Maks: ${maxRad} m)</small>
-              `);
-              $('#btnCheckIn, #btnCheckOut').prop('disabled', false);
-            } else {
-              $('#txtStatusGPS').html(`
-                <div class="text-danger fw-bold"><i class="fas fa-times-circle me-1"></i> Di Luar Radius Sekolah</div>
-                <small class="text-muted">Jarak Anda: <strong>${jarak} m</strong> (Maks: ${maxRad} m)</small>
-              `);
-              $('#btnCheckIn, #btnCheckOut').prop('disabled', true);
-            }
-          },
-          function(err) {
-            $('#txtStatusGPS').html(`<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-1"></i> GPS Gagal: Aktifkan Lokasi HP!</span>`);
-          },
-          { enableHighAccuracy: true }
-        );
-      }
-    });
-  }
-
-  function eksekusiAbsen(tipe) {
-    if (!userCoords) {
-      Swal.fire('Peringatan', 'Lokasi GPS belum terdeteksi!', 'warning');
-      return;
-    }
-
-    let video = document.getElementById('webcamVideo');
-    let canvas = document.getElementById('canvasFoto');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    let fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-    Swal.fire({ title: 'Menyimpan Absen...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-    apiPost({
-      action: "simpanAbsen",
-      payload: {
-        nip: currentUser.nip,
-        nama: currentUser.nama,
-        tipe: tipe,
-        lokasi: userCoords,
-        fotoBase64: fotoBase64
-      }
-    }).done(function(res) {
-      Swal.close();
-      if (res.status === 'BERHASIL') {
-        Swal.fire('Berhasil', res.pesan, 'success');
-      } else {
-        Swal.fire('Gagal Absen', res.pesan, 'error');
-      }
-    });
   }
 
   /* LOGIC DASHBOARD & GRAFIK */
@@ -948,6 +866,53 @@
     }
   }
 
+  function mintaGPS() {
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        userCoords = `${pos.coords.latitude},${pos.coords.longitude}`;
+        $('#txtStatusGPS').html(`<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> GPS Terdeteksi</span>`);
+      },
+      function(err) {
+        $('#txtStatusGPS').html(`<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-1"></i> GPS Gagal: Aktifkan Lokasi</span>`);
+      },
+      { enableHighAccuracy: true }
+    );
+  }
+
+  function eksekusiAbsen(tipe) {
+    if (!userCoords) {
+      Swal.fire('Peringatan', 'Lokasi GPS belum terdeteksi!', 'warning');
+      return;
+    }
+
+    let video = document.getElementById('webcamVideo');
+    let canvas = document.getElementById('canvasFoto');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    let fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+    Swal.fire({ title: 'Menyimpan Absen...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    apiPost({
+      action: "simpanAbsen",
+      payload: {
+        nip: currentUser.nip,
+        nama: currentUser.nama,
+        tipe: tipe,
+        lokasi: userCoords,
+        fotoBase64: fotoBase64
+      }
+    }).done(function(res) {
+      Swal.close();
+      if (res.status === 'BERHASIL') {
+        Swal.fire('Berhasil', res.pesan, 'success');
+      } else {
+        Swal.fire('Gagal', res.pesan, 'error');
+      }
+    });
+  }
+
   /* RIWAYAT PRESENSI GURU */
   function muatRiwayatGuru() {
     apiGet("action=getRiwayatGuru&nip=" + currentUser.nip).done(function(res) {
@@ -965,7 +930,7 @@
               <td>${r.tanggal}</td>
               <td><span class="badge ${badge}">${r.tipe}</span></td>
               <td>${r.jam}</td>
-              <td><small class="badge bg-secondary">${r.jarak || '-'}</small></td>
+              <td><small>${r.lokasi}</small></td>
               <td>${fotoBtn}</td>
             </tr>`;
           });
