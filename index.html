@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SISTEM E-ABSENSI DINAS BM</title>
+  <title>SISTEM E-ABSENSI DINAS BM upt </title>
   
   <!-- CSS Library -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -147,8 +147,8 @@
           </button>
         </form>
         <div class="text-center mt-4">
-        <small class="text-white small">&copy; 2026 Absensi SMA-BM</small>
-      </div>
+          <small class="text-white small">&copy; 2026 Absensi SMA-BM</small>
+        </div>
       </div>
     </div>
   </div>
@@ -247,11 +247,27 @@
         <!-- RIWAYAT PRESENSI GURU -->
         <div id="pageRiwayatGuru" class="page-content d-none">
           <div class="card card-dark shadow-sm p-3 p-md-4 rounded-4">
-            <h5 class="fw-bold mb-3 fs-6 fs-md-5"><i class="fas fa-history text-primary me-2"></i>Riwayat Presensi Saya</h5>
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+              <h5 class="fw-bold mb-0 fs-6 fs-md-5"><i class="fas fa-history text-primary me-2"></i>Riwayat Presensi Saya</h5>
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <input type="month" id="filterBulanGuru" class="form-control form-control-sm bg-dark text-white border-secondary" onchange="muatRiwayatGuru()">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-success fw-bold" onclick="downloadRiwayatGuruCSV()"><i class="fas fa-file-csv me-1"></i> CSV</button>
+                  <button class="btn btn-primary fw-bold" onclick="downloadRiwayatGuruExcel()"><i class="fas fa-file-excel me-1"></i> Excel</button>
+                </div>
+              </div>
+            </div>
             <div class="table-responsive">
               <table class="table table-dark table-hover align-middle">
                 <thead>
-                  <tr><th>Tanggal</th><th>Tipe</th><th>Jam</th><th>Lokasi</th><th>Foto</th></tr>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Tipe</th>
+                    <th>Jam</th>
+                    <th>Keterangan</th>
+                    <th>Lokasi</th>
+                    <th>Foto</th>
+                  </tr>
                 </thead>
                 <tbody id="tbRiwayatGuru"></tbody>
               </table>
@@ -400,25 +416,58 @@
           </div>
         </div>
 
-        <!-- SETTING ABSEN ADMIN -->
+        <!-- SETTING ABSEN ADMIN (LOKASI & BATAS WAKTU) -->
         <div id="pageSettingAbsen" class="page-content d-none">
           <div class="row justify-content-center">
             <div class="col-12 col-md-8">
               <div class="card card-dark shadow-sm p-3 p-md-4 rounded-4">
-                <h5 class="fw-bold mb-3 fs-6 fs-md-5"><i class="fas fa-sliders-h text-primary me-2"></i>Pengaturan Lokasi & Radius</h5>
+                <h5 class="fw-bold mb-3 fs-6 fs-md-5"><i class="fas fa-sliders-h text-primary me-2"></i>Pengaturan Lokasi & Batas Waktu</h5>
                 <form id="formSettingAbsen" onsubmit="simpanSettingAbsen(event)">
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Latitude Sekolah</label>
-                    <input type="text" id="setLat" class="form-control bg-dark text-white border-secondary" required placeholder="-6.200000">
+                  <div class="row g-2 mb-3">
+                    <div class="col-12 col-md-6">
+                      <label class="form-label fw-bold">Latitude Sekolah</label>
+                      <input type="text" id="setLat" class="form-control bg-dark text-white border-secondary" required placeholder="-6.200000">
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label fw-bold">Longitude Sekolah</label>
+                      <input type="text" id="setLng" class="form-control bg-dark text-white border-secondary" required placeholder="106.816666">
+                    </div>
                   </div>
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Longitude Sekolah</label>
-                    <input type="text" id="setLng" class="form-control bg-dark text-white border-secondary" required placeholder="106.816666">
-                  </div>
+
                   <div class="mb-3">
                     <label class="form-label fw-bold">Radius Toleransi (Meter)</label>
                     <input type="number" id="setRadius" class="form-control bg-dark text-white border-secondary" required placeholder="500">
                   </div>
+
+                  <hr class="border-secondary my-3">
+                  <h6 class="fw-bold text-info mb-3"><i class="fas fa-clock me-2"></i>Pengaturan Batas Waktu Absen</h6>
+
+                  <div class="row g-2 mb-3">
+                    <div class="col-12 col-md-6">
+                      <label class="form-label fw-bold">Jam Masuk Normal</label>
+                      <input type="time" id="setJamMasuk" class="form-control bg-dark text-white border-secondary" required>
+                      <small class="text-muted" style="font-size:0.75rem;">Absen lewat jam ini dihitung terlambat.</small>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label fw-bold">Batas Maksimal Check-In</label>
+                      <input type="time" id="setJamMasukBatas" class="form-control bg-dark text-white border-secondary" required>
+                      <small class="text-muted" style="font-size:0.75rem;">Lewat jam ini absen Check-In ditolak.</small>
+                    </div>
+                  </div>
+
+                  <div class="row g-2 mb-3">
+                    <div class="col-12 col-md-6">
+                      <label class="form-label fw-bold">Jam Pulang Normal</label>
+                      <input type="time" id="setJamPulang" class="form-control bg-dark text-white border-secondary" required>
+                      <small class="text-muted" style="font-size:0.75rem;">Sebelum jam ini belum bisa Check-Out.</small>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label fw-bold">Batas Maksimal Check-Out</label>
+                      <input type="time" id="setJamPulangBatas" class="form-control bg-dark text-white border-secondary" required>
+                      <small class="text-muted" style="font-size:0.75rem;">Lewat jam ini Check-Out ditolak.</small>
+                    </div>
+                  </div>
+
                   <button type="button" class="btn btn-outline-info mb-3 w-100" onclick="isiGPSHariIni()">
                     <i class="fas fa-map-marker-alt me-1"></i> Gunakan Lokasi Saya Saat Ini
                   </button>
@@ -506,7 +555,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  // PASTE URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI,
+  // PASTE URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI
   const API_URL = "https://script.google.com/macros/s/AKfycbzXKROJIToOSQZzTZ5z5wDC-DgO4kLsIT71j9FCLZesd3M867SAQATmQirzdu2xWNWa/exec";
 
   let currentUser = null;
@@ -514,12 +563,14 @@
   let videoStream = null;
   let cacheGuruList = [];
   let currentRekapData = [];
+  let currentRiwayatGuruData = [];
   let myChartInstance = null;
 
   $(document).ready(function() {
     setHariIni(false);
     let bulanIni = new Date().toISOString().substring(0, 7);
     $('#filterBulanGrafik').val(bulanIni);
+    $('#filterBulanGuru').val(bulanIni);
 
     let savedUser = localStorage.getItem('user_presensi');
     if (savedUser) {
@@ -745,118 +796,19 @@
     });
   }
 
-  /* LOGIC REKAP PRESENSI HARIAN & BULANAN */
-  function muatRekapHarian() {
-    let tgl = $('#filterTglRekap').val();
-    let bulan = $('#filterBulanRekap').val();
-    
-    let param = "";
-    if (tgl) {
-      param = "tanggal=" + tgl;
-    } else if (bulan) {
-      param = "bulan=" + bulan;
-    } else {
-      setHariIni(false);
-      param = "tanggal=" + $('#filterTglRekap').val();
-    }
-
-    $('#tbRekapHarian').html(`<tr><td colspan="8" class="text-center text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Memuat data presensi...</td></tr>`);
-
-    apiGet("action=getRekapHarian&" + param).done(function(res) {
-      if (res.status === 'BERHASIL') {
-        currentRekapData = res.data.listRekap;
-        let html = '';
-
-        if (currentRekapData.length === 0) {
-          html = `<tr><td colspan="8" class="text-center text-muted">Data presensi tidak ditemukan pada periode ini</td></tr>`;
-        } else {
-          currentRekapData.forEach((item, i) => {
-            let badgeStatus = item.status === 'HADIR' ? 'bg-success' : 'bg-danger';
-            let jamIn = item.checkIn !== '-' ? `<span class="badge bg-primary">${item.checkIn}</span>` : '-';
-            let jamOut = item.checkOut !== '-' ? `<span class="badge bg-warning text-dark">${item.checkOut}</span>` : '-';
-
-            let fotoIn = (item.fotoIn && item.fotoIn.indexOf("http") !== -1)
-              ? `<a href="${item.fotoIn}" target="_blank" class="btn btn-sm btn-outline-info py-0 px-1"><i class="fas fa-image"></i> In</a>` : '';
-            let fotoOut = (item.fotoOut && item.fotoOut.indexOf("http") !== -1)
-              ? `<a href="${item.fotoOut}" target="_blank" class="btn btn-sm btn-outline-warning py-0 px-1 ms-1"><i class="fas fa-image"></i> Out</a>` : '';
-
-            let fotoBtn = (fotoIn || fotoOut) ? `${fotoIn} ${fotoOut}` : '-';
-
-            html += `<tr>
-              <td class="text-center">${i+1}</td>
-              <td class="text-center">${item.tanggal}</td>
-              <td>${item.nip}</td>
-              <td><strong>${item.nama}</strong><br><small class="text-muted">${item.mapel || '-'}</small></td>
-              <td class="text-center"><span class="badge ${badgeStatus}">${item.status}</span></td>
-              <td class="text-center">${jamIn}</td>
-              <td class="text-center">${jamOut}</td>
-              <td class="text-center d-print-none">${fotoBtn}</td>
-            </tr>`;
-          });
-        }
-        $('#tbRekapHarian').html(html);
-      }
-    });
-  }
-
-  function resetFilterBulan() { $('#filterBulanRekap').val(''); }
-  function resetFilterTanggal() { $('#filterTglRekap').val(''); }
-
-  function setHariIni(autoLoad = true) {
-    let today = new Date().toISOString().split('T')[0];
-    $('#filterTglRekap').val(today);
-    $('#filterBulanRekap').val('');
-    if (autoLoad) muatRekapHarian();
-  }
-
-  function downloadExcel() {
-    if (currentRekapData.length === 0) {
-      Swal.fire('Peringatan', 'Tidak ada data untuk diunduh!', 'warning');
-      return;
-    }
-
-    let excelData = currentRekapData.map((item, index) => ({
-      "No": index + 1,
-      "Tanggal": item.tanggal,
-      "NIP": item.nip,
-      "Nama Guru": item.nama,
-      "Mata Pelajaran": item.mapel || '-',
-      "Status": item.status,
-      "Check-In": item.checkIn,
-      "Check-Out": item.checkOut
-    }));
-
-    let filterInfo = $('#filterTglRekap').val() || $('#filterBulanRekap').val();
-    let fileName = `Rekap_Presensi_${filterInfo}.xlsx`;
-
-    let ws = XLSX.utils.json_to_sheet(excelData);
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Rekap Presensi");
-    XLSX.writeFile(wb, fileName);
-  }
-
-  function downloadPDF() {
-    if (currentRekapData.length === 0) {
-      Swal.fire('Peringatan', 'Tidak ada data untuk dicetak!', 'warning');
-      return;
-    }
-
-    let filterInfo = $('#filterTglRekap').val() || $('#filterBulanRekap').val();
-    $('#txtJudulCetak').text("Periode: " + filterInfo);
-
-    window.print();
-  }
-
-  /* KAMERA WEBCAM GURU */
+  /* LOGIC WEBCAM & GPS */
   function nyalakanKamera() {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-      .then(function(stream) {
-        videoStream = stream;
-        document.getElementById('webcamVideo').srcObject = stream;
-      })
-      .catch(function(err) {
-        Swal.fire('Kamera Error', 'Izinkan akses kamera di browser Anda!', 'error');
-      });
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(function(stream) {
+          videoStream = stream;
+          let video = document.getElementById('webcamVideo');
+          video.srcObject = stream;
+        })
+        .catch(function(err) {
+          Swal.fire('Kamera Error', 'Gagal mengakses kamera: ' + err.message, 'error');
+        });
+    }
   }
 
   function matikanKamera() {
@@ -867,32 +819,50 @@
   }
 
   function mintaGPS() {
-    navigator.geolocation.getCurrentPosition(
-      function(pos) {
-        userCoords = `${pos.coords.latitude},${pos.coords.longitude}`;
-        $('#txtStatusGPS').html(`<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> GPS Terdeteksi</span>`);
-      },
-      function(err) {
-        $('#txtStatusGPS').html(`<span class="text-danger fw-bold"><i class="fas fa-exclamation-triangle me-1"></i> GPS Gagal: Aktifkan Lokasi</span>`);
-      },
-      { enableHighAccuracy: true }
-    );
+    $('#txtStatusGPS').html('<span class="text-warning"><i class="fas fa-spinner fa-spin me-1"></i> Mendeteksi Lokasi GPS...</span>');
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          userCoords = position.coords.latitude.toFixed(6) + "," + position.coords.longitude.toFixed(6);
+          $('#txtStatusGPS').html('<span class="text-success"><i class="fas fa-check-circle me-1"></i> Lokasi Terdeteksi: ' + userCoords + '</span>');
+        },
+        function(error) {
+          userCoords = null;
+          $('#txtStatusGPS').html('<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Gagal Deteksi GPS! Aktifkan Lokasi.</span>');
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    } else {
+      $('#txtStatusGPS').html('<span class="text-danger">Browser tidak mendukung GPS!</span>');
+    }
   }
 
   function eksekusiAbsen(tipe) {
     if (!userCoords) {
-      Swal.fire('Peringatan', 'Lokasi GPS belum terdeteksi!', 'warning');
+      Swal.fire('Gagal Absen', 'Koordinat GPS belum terdeteksi. Pastikan Izin Lokasi diaktifkan.', 'warning');
       return;
     }
 
     let video = document.getElementById('webcamVideo');
     let canvas = document.getElementById('canvasFoto');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    let fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+    let context = canvas.getContext('2d');
 
-    Swal.fire({ title: 'Menyimpan Absen...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    canvas.width = video.videoWidth || 320;
+    canvas.height = video.videoHeight || 240;
+    
+    // Mirror foto agar sesuai tampilan kamera
+    context.translate(canvas.width, 0);
+    context.scale(-1, 1);
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    let fotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+
+    Swal.fire({
+      title: 'Memproses Absen...',
+      text: 'Mengirim data ke server...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
 
     apiPost({
       action: "simpanAbsen",
@@ -905,133 +875,281 @@
       }
     }).done(function(res) {
       Swal.close();
-      if (res.status === 'BERHASIL') {
-        Swal.fire('Berhasil', res.pesan, 'success');
+      if (res.status === "BERHASIL") {
+        Swal.fire('Berhasil!', res.pesan, 'success');
       } else {
-        Swal.fire('Gagal', res.pesan, 'error');
+        Swal.fire('Absen Ditolak', res.pesan, 'error');
       }
     });
   }
 
-  /* RIWAYAT PRESENSI GURU */
- function muatRiwayatGuru() {
-    apiGet("action=getRiwayatGuru&nip=" + currentUser.nip).done(function(res) {
-      if (res.status === 'BERHASIL') {
-        let html = '';
-        if (res.data.length === 0) {
-          html = `<tr><td colspan="5" class="text-center text-muted">Belum ada riwayat presensi</td></tr>`;
-        } else {
-          res.data.forEach(r => {
-            let badge = r.tipe === 'CHECK_IN' ? 'bg-success' : 'bg-warning text-dark';
-            let fotoBtn = r.foto.indexOf("http") !== -1 
-              ? `<a href="${r.foto}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fas fa-image"></i> Lihat</a>` 
-              : '-';
-            html += `<tr>
+  /* LOGIC RIWAYAT GURU */
+  function muatRiwayatGuru() {
+    let bulan = $('#filterBulanGuru').val();
+    if (!bulan) {
+      bulan = new Date().toISOString().substring(0, 7);
+      $('#filterBulanGuru').val(bulan);
+    }
+
+    $('#tbRiwayatGuru').html('<tr><td colspan="6" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Memuat riwayat...</td></tr>');
+
+    apiGet("action=getRiwayatGuru&nip=" + currentUser.nip + "&bulan=" + bulan).done(function(res) {
+      let data = res.data || res;
+      currentRiwayatGuruData = data;
+      let html = '';
+
+      if (!data || data.length === 0) {
+        html = '<tr><td colspan="6" class="text-center text-muted py-3">Tidak ada data presensi pada bulan ini.</td></tr>';
+      } else {
+        data.forEach(function(r) {
+          let badgeKet = '<span class="badge bg-success">' + (r.keterangan || 'TEPAT WAKTU') + '</span>';
+          if (r.keterangan && r.keterangan.includes('TERLAMBAT')) {
+            badgeKet = '<span class="badge bg-warning text-dark">' + r.keterangan + '</span>';
+          }
+
+          let imgTag = r.foto ? `<a href="${r.foto}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fas fa-image"></i></a>` : '-';
+          
+          html += `
+            <tr>
               <td>${r.tanggal}</td>
-              <td><span class="badge ${badge}">${r.tipe}</span></td>
+              <td><span class="badge ${r.tipe === 'CHECK_IN' ? 'bg-primary' : 'bg-warning text-dark'}">${r.tipe}</span></td>
               <td>${r.jam}</td>
+              <td>${badgeKet}</td>
               <td><small>${r.lokasi}</small></td>
-              <td>${fotoBtn}</td>
+              <td>${imgTag}</td>
             </tr>`;
-          });
-        }
-        $('#tbRiwayatGuru').html(html);
+        });
       }
+
+      $('#tbRiwayatGuru').html(html);
     });
   }
 
-// 2. Fungsi Ekspor/Download Data ke File CSV
-function downloadRiwayatCSV() {
-  var bulanPilihan = document.getElementById("filterBulan").value;
-  var rows = [["Tanggal", "Tipe", "Jam", "Keterangan", "Lokasi"]];
-  
-  // Ambil data riwayat yang sedang tampil
-  dataRiwayatSaatIni.forEach(item => {
-    rows.push([item.tanggal, item.tipe, item.jam, item.keterangan, `"${item.lokasi}"`]);
-  });
+  function downloadRiwayatGuruCSV() {
+    if (!currentRiwayatGuruData || currentRiwayatGuruData.length === 0) {
+      Swal.fire('Data Kosong', 'Tidak ada data untuk diunduh pada bulan ini.', 'warning');
+      return;
+    }
 
-  var csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
-  var encodedUri = encodeURI(csvContent);
-  var link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `Riwayat_Absen_${currentUser.nip}_${bulanPilihan}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
+    let bulan = $('#filterBulanGuru').val();
+    let csvRows = [["Tanggal", "Tipe", "Jam", "Keterangan", "Lokasi"]];
 
-  /* DATA GURU MANAGEMENT (ADMIN) */
-  function muatGuru() {
-    apiGet("action=getDataGuru").done(function(res) {
-      if (res.status === 'BERHASIL') {
-        cacheGuruList = res.data;
-        let html = '';
-        res.data.forEach((g, i) => {
-          html += `<tr>
-            <td>${i+1}</td>
-            <td>${g.nip}</td>
-            <td>${g.nama}</td>
-            <td>${g.username}</td>
-            <td><span class="badge bg-secondary">${g.role}</span></td>
-            <td>${g.noHp || '-'}</td>
-            <td>${g.mapel || '-'}</td>
-            <td>
-              <button class="btn btn-sm btn-warning text-white me-1" onclick="editGuru(${i})"><i class="fas fa-edit"></i></button>
-              <button class="btn btn-sm btn-danger" onclick="hapusGuru(${g.rowIndex})"><i class="fas fa-trash"></i></button>
-            </td>
-          </tr>`;
+    currentRiwayatGuruData.forEach(function(item) {
+      csvRows.push([
+        item.tanggal,
+        item.tipe,
+        item.jam,
+        `"${item.keterangan || 'TEPAT WAKTU'}"`,
+        `"${item.lokasi}"`
+      ]);
+    });
+
+    let csvContent = "data:text/csv;charset=utf-8," + csvRows.map(e => e.join(",")).join("\n");
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Riwayat_Absen_${currentUser.nip}_${bulan}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function downloadRiwayatGuruExcel() {
+    if (!currentRiwayatGuruData || currentRiwayatGuruData.length === 0) {
+      Swal.fire('Data Kosong', 'Tidak ada data untuk diunduh pada bulan ini.', 'warning');
+      return;
+    }
+
+    let bulan = $('#filterBulanGuru').val();
+    let dataExcel = currentRiwayatGuruData.map(item => ({
+      "Tanggal": item.tanggal,
+      "Tipe": item.tipe,
+      "Jam": item.jam,
+      "Keterangan": item.keterangan || "TEPAT WAKTU",
+      "Lokasi": item.lokasi
+    }));
+
+    let worksheet = XLSX.utils.json_to_sheet(dataExcel);
+    let workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Riwayat Presensi");
+    XLSX.writeFile(workbook, `Riwayat_Absen_${currentUser.nip}_${bulan}.xlsx`);
+  }
+
+  /* LOGIC REKAP HARIAN ADMIN */
+  function setHariIni(triggerFetch) {
+    let today = new Date().toISOString().substring(0, 10);
+    $('#filterTglRekap').val(today);
+    $('#filterBulanRekap').val('');
+    if (triggerFetch) muatRekapHarian();
+  }
+
+  function resetFilterBulan() {
+    $('#filterBulanRekap').val('');
+  }
+
+  function resetFilterTanggal() {
+    $('#filterTglRekap').val('');
+  }
+
+  function muatRekapHarian() {
+    let tgl = $('#filterTglRekap').val();
+    let bulan = $('#filterBulanRekap').val();
+    let queryParam = "action=getRekapAbsen";
+
+    if (tgl) {
+      queryParam += "&tanggal=" + tgl;
+      $('#txtJudulCetak').text("Tanggal: " + tgl);
+    } else if (bulan) {
+      queryParam += "&bulan=" + bulan;
+      $('#txtJudulCetak').text("Bulan: " + bulan);
+    } else {
+      setHariIni(false);
+      queryParam += "&tanggal=" + $('#filterTglRekap').val();
+      $('#txtJudulCetak').text("Tanggal: " + $('#filterTglRekap').val());
+    }
+
+    $('#tbRekapHarian').html('<tr><td colspan="8" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Memuat rekap...</td></tr>');
+
+    apiGet(queryParam).done(function(res) {
+      let data = res.data || res;
+      currentRekapData = data;
+      let html = '';
+
+      if (!data || data.length === 0) {
+        html = '<tr><td colspan="8" class="text-center text-muted py-3">Tidak ada data presensi ditemukan.</td></tr>';
+      } else {
+        data.forEach(function(r, idx) {
+          let badgeStatus = '<span class="badge bg-success">' + (r.status || 'HADIR') + '</span>';
+          if (r.status && r.status.includes('TERLAMBAT')) {
+            badgeStatus = '<span class="badge bg-warning text-dark">' + r.status + '</span>';
+          } else if (r.status === 'BELUM ABSEN' || r.status === 'TIDAK HADIR') {
+            badgeStatus = '<span class="badge bg-danger">' + r.status + '</span>';
+          }
+
+          let imgTag = r.foto ? `<a href="${r.foto}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fas fa-image"></i></a>` : '-';
+
+          html += `
+            <tr>
+              <td class="text-center">${idx + 1}</td>
+              <td>${r.tanggal || '-'}</td>
+              <td>${r.nip}</td>
+              <td>${r.nama}</td>
+              <td class="text-center">${badgeStatus}</td>
+              <td class="text-center">${r.checkIn || '-'}</td>
+              <td class="text-center">${r.checkOut || '-'}</td>
+              <td class="text-center d-print-none">${imgTag}</td>
+            </tr>`;
         });
-        $('#tbDataGuru').html(html);
       }
+
+      $('#tbRekapHarian').html(html);
+    });
+  }
+
+  function downloadExcel() {
+    if (!currentRekapData || currentRekapData.length === 0) {
+      Swal.fire('Warning', 'Tidak ada data rekap untuk diekspor', 'warning');
+      return;
+    }
+
+    let dataExport = currentRekapData.map((item, index) => ({
+      "No": index + 1,
+      "Tanggal": item.tanggal || "-",
+      "NIP": item.nip,
+      "Nama Guru": item.nama,
+      "Status": item.status,
+      "Check In": item.checkIn || "-",
+      "Check Out": item.checkOut || "-"
+    }));
+
+    let worksheet = XLSX.utils.json_to_sheet(dataExport);
+    let workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Presensi");
+    XLSX.writeFile(workbook, `Rekap_Presensi_${$('#filterTglRekap').val() || $('#filterBulanRekap').val()}.xlsx`);
+  }
+
+  function downloadPDF() {
+    window.print();
+  }
+
+  /* LOGIC DATA GURU ADMIN */
+  function muatGuru() {
+    $('#tbDataGuru').html('<tr><td colspan="8" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data guru...</td></tr>');
+
+    apiGet("action=getGuruList").done(function(res) {
+      let data = res.data || res;
+      cacheGuruList = data;
+      let html = '';
+
+      if (!data || data.length === 0) {
+        html = '<tr><td colspan="8" class="text-center text-muted py-3">Belum ada data guru.</td></tr>';
+      } else {
+        data.forEach(function(g, idx) {
+          html += `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${g.nip}</td>
+              <td>${g.nama}</td>
+              <td>${g.username}</td>
+              <td><span class="badge ${g.role === 'Admin' ? 'bg-danger' : 'bg-primary'}">${g.role}</span></td>
+              <td>${g.noHp || '-'}</td>
+              <td>${g.mapel || '-'}</td>
+              <td>
+                <button class="btn btn-sm btn-warning text-white me-1" onclick="editGuru(${idx})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="hapusGuru('${g.nip}')"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>`;
+        });
+      }
+
+      $('#tbDataGuru').html(html);
     });
   }
 
   function bukaModalGuru() {
+    $('#formGuruSubmit')[0].reset();
     $('#guruRowIndex').val("0");
-    $('#guruNip').val("").prop('readonly', false);
-    $('#guruNama').val("");
-    $('#guruUsername').val("");
-    $('#guruPassword').val("");
-    $('#guruRole').val("Guru");
-    $('#guruNoHp').val("");
-    $('#guruMapel').val("");
-    $('#modalGuruTitle').text("Tambah Guru Baru");
-    new bootstrap.Modal(document.getElementById('modalFormGuru')).show();
+    $('#modalGuruTitle').text("Tambah Data Guru");
+    let modal = new bootstrap.Modal(document.getElementById('modalFormGuru'));
+    modal.show();
   }
 
-  function editGuru(index) {
-    let g = cacheGuruList[index];
-    $('#guruRowIndex').val(g.rowIndex);
-    $('#guruNip').val(g.nip).prop('readonly', true);
+  function editGuru(idx) {
+    let g = cacheGuruList[idx];
+    if (!g) return;
+
+    $('#guruRowIndex').val(idx + 1);
+    $('#guruNip').val(g.nip);
     $('#guruNama').val(g.nama);
     $('#guruUsername').val(g.username);
     $('#guruPassword').val(g.password);
     $('#guruRole').val(g.role);
-    $('#guruNoHp').val(g.noHp);
-    $('#guruMapel').val(g.mapel);
+    $('#guruNoHp').val(g.noHp || '');
+    $('#guruMapel').val(g.mapel || '');
+
     $('#modalGuruTitle').text("Edit Data Guru");
-    new bootstrap.Modal(document.getElementById('modalFormGuru')).show();
+    let modal = new bootstrap.Modal(document.getElementById('modalFormGuru'));
+    modal.show();
   }
 
   function simpanGuru(e) {
     e.preventDefault();
     Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-    apiPost({
-      action: "simpanGuru",
-      payload: {
-        rowIndex: $('#guruRowIndex').val(),
-        nip: $('#guruNip').val(),
-        nama: $('#guruNama').val(),
-        username: $('#guruUsername').val(),
-        password: $('#guruPassword').val(),
-        role: $('#guruRole').val(),
-        noHp: $('#guruNoHp').val(),
-        mapel: $('#guruMapel').val()
-      }
-    }).done(function(res) {
+    let payload = {
+      rowIndex: $('#guruRowIndex').val(),
+      nip: $('#guruNip').val(),
+      nama: $('#guruNama').val(),
+      username: $('#guruUsername').val(),
+      password: $('#guruPassword').val(),
+      role: $('#guruRole').val(),
+      noHp: $('#guruNoHp').val(),
+      mapel: $('#guruMapel').val()
+    };
+
+    apiPost({ action: "simpanGuru", payload: payload }).done(function(res) {
       Swal.close();
-      if (res.status === 'BERHASIL') {
+      if (res.status === "BERHASIL") {
         bootstrap.Modal.getInstance(document.getElementById('modalFormGuru')).hide();
         Swal.fire('Berhasil', res.pesan, 'success');
         muatGuru();
@@ -1041,19 +1159,20 @@ function downloadRiwayatCSV() {
     });
   }
 
-  function hapusGuru(rowIndex) {
+  function hapusGuru(nip) {
     Swal.fire({
       title: 'Hapus Guru?',
-      text: "Data yang dihapus tidak dapat dikembalikan!",
+      text: 'Yakin ingin menghapus guru NIP: ' + nip + '?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Ya, Hapus'
+      confirmButtonText: 'Ya, Hapus',
+      cancelButtonText: 'Batal'
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-        apiPost({ action: "hapusGuru", payload: { rowIndex: rowIndex } }).done(function(res) {
+        apiPost({ action: "hapusGuru", payload: { nip: nip } }).done(function(res) {
           Swal.close();
-          if (res.status === 'BERHASIL') {
+          if (res.status === "BERHASIL") {
             Swal.fire('Terhapus', res.pesan, 'success');
             muatGuru();
           } else {
@@ -1064,44 +1183,58 @@ function downloadRiwayatCSV() {
     });
   }
 
-  /* SETTING ABSEN ADMIN */
+  /* LOGIC SETTING ABSEN ADMIN (LOKASI & BATAS WAKTU) */
   function muatSettingAbsen() {
+    Swal.fire({ title: 'Memuat Setting...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
     apiGet("action=getSetting").done(function(res) {
-      if (res.status === 'BERHASIL') {
-        $('#setLat').val(res.data.latitude);
-        $('#setLng').val(res.data.longitude);
-        $('#setRadius').val(res.data.radiusMeter);
-      }
-    });
-  }
-
-  function simpanSettingAbsen(e) {
-    e.preventDefault();
-    Swal.fire({ title: 'Menyimpan Pengaturan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-    apiPost({
-      action: "simpanSetting",
-      payload: {
-        latitude: $('#setLat').val(),
-        longitude: $('#setLng').val(),
-        radiusMeter: $('#setRadius').val()
-      }
-    }).done(function(res) {
       Swal.close();
-      if (res.status === 'BERHASIL') {
-        Swal.fire('Berhasil', res.pesan, 'success');
-      } else {
-        Swal.fire('Gagal', res.pesan, 'error');
-      }
+      let d = res.data || res;
+      $('#setLat').val(d.latitude || '');
+      $('#setLng').val(d.longitude || '');
+      $('#setRadius').val(d.radiusMeter || 500);
+
+      // Load Batas Waktu Jam Kerja
+      $('#setJamMasuk').val(d.jamMasuk || '07:00');
+      $('#setJamMasukBatas').val(d.jamMasukBatas || '08:00');
+      $('#setJamPulang').val(d.jamPulang || '15:00');
+      $('#setJamPulangBatas').val(d.jamPulangBatas || '17:00');
     });
   }
 
   function isiGPSHariIni() {
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      $('#setLat').val(pos.coords.latitude);
-      $('#setLng').val(pos.coords.longitude);
-    }, function() {
-      Swal.fire('Error', 'Gagal mengambil posisi GPS!', 'error');
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        $('#setLat').val(pos.coords.latitude.toFixed(6));
+        $('#setLng').val(pos.coords.longitude.toFixed(6));
+        Swal.fire('Lokasi Diperbarui', 'Koordinat Anda telah diisikan.', 'success');
+      }, function() {
+        Swal.fire('Gagal', 'Tidak bisa mengambil koordinat lokasi.', 'error');
+      });
+    }
+  }
+
+  function simpanSettingAbsen(e) {
+    e.preventDefault();
+    Swal.fire({ title: 'Menyimpan Setting...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    let payload = {
+      latitude: $('#setLat').val(),
+      longitude: $('#setLng').val(),
+      radiusMeter: $('#setRadius').val(),
+      jamMasuk: $('#setJamMasuk').val(),
+      jamMasukBatas: $('#setJamMasukBatas').val(),
+      jamPulang: $('#setJamPulang').val(),
+      jamPulangBatas: $('#setJamPulangBatas').val()
+    };
+
+    apiPost({ action: "simpanSetting", payload: payload }).done(function(res) {
+      Swal.close();
+      if (res.status === "BERHASIL") {
+        Swal.fire('Berhasil', res.pesan, 'success');
+      } else {
+        Swal.fire('Gagal', res.pesan, 'error');
+      }
     });
   }
 </script>
