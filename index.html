@@ -112,22 +112,40 @@
 
     <!-- PAGE AKUN / PROFIL -->
     <div id="pageAkunGuru" class="page-content d-none">
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-6 text-center">
-          <div class="card card-dark p-4 rounded-4 shadow-sm">
-            <h5 class="fw-bold text-white txtNamaUser">-</h5>
-            <p class="text-muted small mb-3 txtRoleUser">Guru</p>
-            <ul class="list-group list-group-flush text-start mb-4">
-              <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between"><span>NIP:</span> <strong id="txtProfileNip">-</strong></li>
-              <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between"><span>Mapel:</span> <strong id="txtProfileMapel">-</strong></li>
-            </ul>
-            <button class="btn btn-danger w-100 fw-bold" onclick="prosesLogout()"><i class="fas fa-sign-out-alt me-2"></i> Keluar</button>
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4 text-center">
+              <div class="card card-dark p-4 rounded-4 shadow-sm">
+                <div class="mb-3">
+                  <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 80px; height: 80px;">
+                    <i class="fas fa-user-tie fa-3x"></i>
+                  </div>
+                  <h5 class="fw-bold text-white mb-0 txtNamaUser">-</h5>
+                  <span class="badge bg-primary text-uppercase mt-1 txtRoleUser">-</span>
+                </div>
+
+                <ul class="list-group list-group-flush text-start mb-4">
+                  <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
+                    <span class="text-white">NIP/ID</span>
+                    <strong id="txtProfileNip">-</strong>
+                  </li>
+                  <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
+                    <span class="text-white">Mata Pelajaran</span>
+                    <strong id="txtProfileMapel">-</strong>
+                  </li>
+                  <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
+                    <span class="text-white">No HP</span>
+                    <strong id="txtProfileNoHp">-</strong>
+                  </li>
+                </ul>
+
+                <button class="btn btn-danger w-100 py-2 fw-bold rounded-3" onclick="prosesLogout()">
+                  <i class="fas fa-sign-out-alt me-2"></i> Keluar / Logout
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-  </div>
 
   <!-- BOTTOM NAV -->
   <div class="bottom-nav">
