@@ -914,31 +914,36 @@
   }
 
   /* RIWAYAT PRESENSI GURU */
-  function muatRiwayatGuru() {
-    apiGet("action=getRiwayatGuru&nip=" + currentUser.nip).done(function(res) {
-      if (res.status === 'BERHASIL') {
-        let html = '';
-        if (res.data.length === 0) {
-          html = `<tr><td colspan="5" class="text-center text-muted">Belum ada riwayat presensi</td></tr>`;
-        } else {
-          res.data.forEach(r => {
-            let badge = r.tipe === 'CHECK_IN' ? 'bg-success' : 'bg-warning text-dark';
-            let fotoBtn = r.foto.indexOf("http") !== -1 
-              ? `<a href="${r.foto}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fas fa-image"></i> Lihat</a>` 
-              : '-';
-            html += `<tr>
-              <td>${r.tanggal}</td>
-              <td><span class="badge ${badge}">${r.tipe}</span></td>
-              <td>${r.jam}</td>
-              <td><small>${r.lokasi}</small></td>
-              <td>${fotoBtn}</td>
-            </tr>`;
-          });
-        }
-        $('#tbRiwayatGuru').html(html);
-      }
+ function muatRiwayatGuru() {
+  var nipGuru = currentUser.nip; // NIP Guru yang login
+  var bulanPilihan = document.getElementById("filterBulan").value; // Format: YYYY-MM
+
+  // Kirim request ke backend GS
+  fetch(`${WEB_APP_URL}?action=getRiwayatGuru&nip=${nipGuru}&bulan=${bulanPilihan}`)
+    .then(res => res.json())
+    .then(res => {
+      renderTabelRiwayat(res.data);
     });
-  }
+}
+// 2. Fungsi Ekspor/Download Data ke File CSV
+function downloadRiwayatCSV() {
+  var bulanPilihan = document.getElementById("filterBulan").value;
+  var rows = [["Tanggal", "Tipe", "Jam", "Keterangan", "Lokasi"]];
+  
+  // Ambil data riwayat yang sedang tampil
+  dataRiwayatSaatIni.forEach(item => {
+    rows.push([item.tanggal, item.tipe, item.jam, item.keterangan, `"${item.lokasi}"`]);
+  });
+
+  var csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+  var encodedUri = encodeURI(csvContent);
+  var link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `Riwayat_Absen_${currentUser.nip}_${bulanPilihan}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
   /* DATA GURU MANAGEMENT (ADMIN) */
   function muatGuru() {
