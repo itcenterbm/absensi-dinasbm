@@ -555,7 +555,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  // PASTE URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI
   const API_URL = "https://script.google.com/macros/s/AKfycbzXKROJIToOSQZzTZ5z5wDC-DgO4kLsIT71j9FCLZesd3M867SAQATmQirzdu2xWNWa/exec";
 
   let currentUser = null;
@@ -567,44 +566,53 @@
   let myChartInstance = null;
 
   $(document).ready(function() {
-    setHariIni(false);
     let bulanIni = new Date().toISOString().substring(0, 7);
     $('#filterBulanGrafik').val(bulanIni);
     $('#filterBulanGuru').val(bulanIni);
 
     let savedUser = localStorage.getItem('user_presensi');
     if (savedUser) {
-      currentUser = JSON.parse(savedUser);
-      bukaAplikasi();
+      try {
+        currentUser = JSON.parse(savedUser);
+        bukaAplikasi();
+      } catch(e) {
+        localStorage.removeItem('user_presensi');
+      }
     }
   });
 
+  // Fungsi POST Ringan dengan Timeout Fast-Fail
   function apiPost(payload) {
     return $.ajax({
       url: API_URL,
       type: "POST",
       data: JSON.stringify(payload),
-      contentType: "text/plain;charset=utf-8"
+      contentType: "text/plain;charset=utf-8",
+      timeout: 20000
     });
   }
 
+  // Fungsi GET Ringan
   function apiGet(param) {
     return $.ajax({
       url: API_URL + "?" + param,
       type: "GET",
-      dataType: "json"
+      dataType: "json",
+      timeout: 15000
     });
   }
 
   function prosesLogin(e) {
     e.preventDefault();
-    Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    
+    let btnSubmit = $(e.target).find('button[type="submit"]');
+    btnSubmit.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> Memproses...');
 
     apiPost({
       action: "login",
       payload: { username: $('#loginUser').val(), password: $('#loginPass').val() }
     }).done(function(res) {
-      Swal.close();
+      btnSubmit.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i> Masuk');
       if (res.status === "BERHASIL") {
         currentUser = res.user;
         localStorage.setItem('user_presensi', JSON.stringify(currentUser));
@@ -612,6 +620,9 @@
       } else {
         Swal.fire('Gagal', res.pesan, 'error');
       }
+    }).fail(function() {
+      btnSubmit.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i> Masuk');
+      Swal.fire('Koneksi Lambat', 'Server merespons terlalu lama. Silakan coba klik Masuk lagi.', 'warning');
     });
   }
 
@@ -670,6 +681,7 @@
 
     renderMenuNavigasi();
 
+    // Langsung buka UI tanpa menunggu request berat
     if (currentUser.role.toLowerCase() === 'admin') {
       navigasi('dashboard');
     } else {
@@ -685,29 +697,23 @@
 
   function navigasi(page) {
     $('.page-content').addClass('d-none');
-    
-    // Reset State Navigasi
     $('.sidebar .nav-link').removeClass('active');
     $('.bottom-nav-item').removeClass('active');
-    
-    // Highlight Active Item
     $('.nav-' + page).addClass('active');
 
-    // Auto close offcanvas sidebar jika terbuka
     let offcanvasEl = document.getElementById('mobileSidebar');
     let bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
     if (bsOffcanvas) bsOffcanvas.hide();
 
-    // Scroll ke Paling Atas Otomatis
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (page === 'dashboard') {
       $('#pageDashboard').removeClass('d-none');
-      muatDashboard();
+      setTimeout(muatDashboard, 50);
       matikanKamera();
     } else if (page === 'rekapHarian') {
       $('#pageRekapHarian').removeClass('d-none');
-      muatRekapHarian();
+      setTimeout(muatRekapHarian, 50);
       matikanKamera();
     } else if (page === 'absenGuru') {
       $('#pageAbsenGuru').removeClass('d-none');
@@ -715,18 +721,18 @@
       mintaGPS();
     } else if (page === 'riwayatGuru') {
       $('#pageRiwayatGuru').removeClass('d-none');
-      muatRiwayatGuru();
+      setTimeout(muatRiwayatGuru, 50);
       matikanKamera();
     } else if (page === 'akunGuru') {
       $('#pageAkunGuru').removeClass('d-none');
       matikanKamera();
     } else if (page === 'dataGuru') {
       $('#pageDataGuru').removeClass('d-none');
-      muatGuru();
+      setTimeout(muatGuru, 50);
       matikanKamera();
     } else if (page === 'settingAbsen') {
       $('#pageSettingAbsen').removeClass('d-none');
-      muatSettingAbsen();
+      setTimeout(muatSettingAbsen, 50);
       matikanKamera();
     }
   }
@@ -746,19 +752,13 @@
   }
 
   function muatGrafikDashboard() {
-    let bulan = $('#filterBulanGrafik').val();
-    if (!bulan) {
-      bulan = new Date().toISOString().substring(0, 7);
-      $('#filterBulanGrafik').val(bulan);
-    }
+    let bulan = $('#filterBulanGrafik').val() || new Date().toISOString().substring(0, 7);
 
     apiGet("action=getGrafikBulanan&bulan=" + bulan).done(function(res) {
       if (res.status === 'BERHASIL') {
         let ctx = document.getElementById('chartKehadiran').getContext('2d');
 
-        if (myChartInstance) {
-          myChartInstance.destroy();
-        }
+        if (myChartInstance) myChartInstance.destroy();
 
         myChartInstance = new Chart(ctx, {
           type: 'bar',
@@ -777,19 +777,10 @@
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-              y: {
-                beginAtZero: true,
-                ticks: { precision: 0, color: '#94a3b8' },
-                grid: { color: '#334155' }
-              },
-              x: {
-                ticks: { color: '#94a3b8' },
-                grid: { color: '#334155' }
-              }
+              y: { beginAtZero: true, ticks: { precision: 0, color: '#94a3b8' }, grid: { color: '#334155' } },
+              x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
             },
-            plugins: {
-              legend: { display: true, position: 'top', labels: { color: '#f8fafc' } }
-            }
+            plugins: { legend: { display: true, position: 'top', labels: { color: '#f8fafc' } } }
           }
         });
       }
@@ -806,7 +797,7 @@
           video.srcObject = stream;
         })
         .catch(function(err) {
-          Swal.fire('Kamera Error', 'Gagal mengakses kamera: ' + err.message, 'error');
+          console.warn('Kamera warning:', err.message);
         });
     }
   }
@@ -830,7 +821,7 @@
           userCoords = null;
           $('#txtStatusGPS').html('<span class="text-danger"><i class="fas fa-times-circle me-1"></i> Gagal Deteksi GPS! Aktifkan Lokasi.</span>');
         },
-        { enableHighAccuracy: true, timeout: 10000 }
+        { enableHighAccuracy: true, timeout: 8000 }
       );
     } else {
       $('#txtStatusGPS').html('<span class="text-danger">Browser tidak mendukung GPS!</span>');
@@ -850,16 +841,16 @@
     canvas.width = video.videoWidth || 320;
     canvas.height = video.videoHeight || 240;
     
-    // Mirror foto agar sesuai tampilan kamera
     context.translate(canvas.width, 0);
     context.scale(-1, 1);
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    let fotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
+    // Kompresi foto ke 0.5 agar pengiriman data jauh lebih cepat
+    let fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
 
     Swal.fire({
       title: 'Memproses Absen...',
-      text: 'Mengirim data ke server...',
+      text: 'Mengirim data...',
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
@@ -880,16 +871,15 @@
       } else {
         Swal.fire('Absen Ditolak', res.pesan, 'error');
       }
+    }).fail(function() {
+      Swal.close();
+      Swal.fire('Timeout', 'Koneksi lambat saat mengirim foto. Silakan coba lagi.', 'error');
     });
   }
 
   /* LOGIC RIWAYAT GURU */
   function muatRiwayatGuru() {
-    let bulan = $('#filterBulanGuru').val();
-    if (!bulan) {
-      bulan = new Date().toISOString().substring(0, 7);
-      $('#filterBulanGuru').val(bulan);
-    }
+    let bulan = $('#filterBulanGuru').val() || new Date().toISOString().substring(0, 7);
 
     $('#tbRiwayatGuru').html('<tr><td colspan="6" class="text-center py-3"><i class="fas fa-spinner fa-spin me-2"></i> Memuat riwayat...</td></tr>');
 
@@ -1183,18 +1173,14 @@
     });
   }
 
-  /* LOGIC SETTING ABSEN ADMIN (LOKASI & BATAS WAKTU) */
+  /* LOGIC SETTING ABSEN ADMIN */
   function muatSettingAbsen() {
-    Swal.fire({ title: 'Memuat Setting...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
     apiGet("action=getSetting").done(function(res) {
-      Swal.close();
       let d = res.data || res;
       $('#setLat').val(d.latitude || '');
       $('#setLng').val(d.longitude || '');
       $('#setRadius').val(d.radiusMeter || 500);
 
-      // Load Batas Waktu Jam Kerja
       $('#setJamMasuk').val(d.jamMasuk || '07:00');
       $('#setJamMasukBatas').val(d.jamMasukBatas || '08:00');
       $('#setJamPulang').val(d.jamPulang || '15:00');
